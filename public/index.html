@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FLOG Developer's Web</title>
+    <link rel="icon" type="image/x-icon" href="app_logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
+    <style>
+      body {
+      background-color: #fff; /* White background color */
+    }
+
+    #logo {
+      max-width: 20%;
+      height: auto;
+      display: block;
+      margin: 20px auto;
+    }
+
+    #questionNo, #puzzleNo {
+      width: 40px; 
+    }
+    
+    #questionContent {
+      width: 680px;
+    }
+          
+    #loading {
+      display: none; /* 초기에는 숨겨진 상태 */
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      width: 100%;        
+      height: 100%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #loading .spinner-border {
+      border-color: #62BC1B transparent; 
+    }
+
+    .nav-tabs .nav-link {
+      color: #62BC1B; /* 탭 텍스트 색상 */
+      font-size: 20px;
+      border: 1px solid #62BC1B; /* 탭 테두리 색상 */
+      border-radius: 8px 8px 8px 8px; /* 탭 상단의 둥근 모서리 */
+      font-family: 'Baloo Bhaijaan 2', sans-serif;
+    }
+
+    .nav-tabs .nav-link.active {
+      background-color: #62BC1B;; /* 활성화된 탭 배경색 */
+      border: 1px solid #62BC1B; /* 탭 테두리 색상 */
+      font-size: 20px;
+      color: #fff; /* 활성화된 탭 텍스트 색상 */
+      font-family: 'Baloo Bhaijaan 2', sans-serif;
+    }
+
+    .tab-content {
+      border: 1px solid #62BC1B; /* 탭 콘텐츠의 테두리 색상 */
+      border-radius: 0 8px 8px 8px; /* 탭 콘텐츠 하단의 둥근 모서리 */
+      padding: 15px; /* 탭 콘텐츠의 패딩 */
+    }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+
+  <body>
+    <img id="logo" src="flog_name_3d.png" alt="Logo">
+    <div class="container mt-3">
+      <!-- 탭 메뉴 -->
+      <ul class="nav nav-tabs" id="myTabs">
+        <li class="nav-item">
+          <a class="nav-link active" id="question-tab" data-bs-toggle="tab" href="#question">Question</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="memory-tab" data-bs-toggle="tab" href="#memory">Memory Book</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content" style="margin-top: 20px;">
+         <!-- 질문 관리 탭 -->
+         <div class="tab-pane fade show active" id="question">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; border-radius: 10px 0 0 0; text-align: center; font-family: 'Baloo Bhaijaan 2', sans-serif; font-size: 18px;">PuzzleNo</th>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; text-align: center; font-family: 'Baloo Bhaijaan 2', sans-serif; font-size: 18px;">QuestionNo</th>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; text-align: center; font-family: 'Baloo Bhaijaan 2', sans-serif; font-size: 18px;">Question Content</th>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; border-radius: 0 10px 0 0; text-align: center;"></th>
+              </tr>
+            </thead>  
+            <tbody id="text-list"></tbody>
+          </table>
+          
+          <form id="input-form" class="mt-1">
+            <div class="row">
+              <div class="col" style="margin-left: 40px;">
+                <input type="text" class="form-control" id="puzzleNo" style="font-family: 'Nanum Gothic', sans-serif;">
+                <label for="puzzleNo" class="form-label" style="font-size: 12px; color: #d2d3d2; font-family: 'Baloo Bhaijaan 2', sans-serif;">PuzzleNo</label>
+              </div>
+              <div class="col" style="margin-left: 30px;">
+                <input type="text" class="form-control" id="questionNo" style="font-family: 'Nanum Gothic', sans-serif;">
+                <label for="questionNo" class="form-label" style="font-size: 12px; color: #d2d3d2; font-family: 'Baloo Bhaijaan 2', sans-serif;">QuestionNo</label>
+              </div>
+              <div class="col">
+                <textarea class="form-control" id="questionContent" style="font-family: 'Nanum Gothic', sans-serif; width: 890px; height: 90px;"></textarea>
+              </div>              
+              <div class="col mt-1 ml-2">
+                <button type="submit" class="btn btn-primary btn-sm d-inline" style="margin-left: 8px; font-size: 14px; font-family: 'Nanum Gothic', sans-serif; white-space: nowrap; border-radius: 8px; background-color: #62BC1B; color: #ffffff; border: 1px solid #62BC1B;">확인</button>
+                <div style="margin-top: 10px;"></div>
+                <button type="button" id="generate-new-question" class="btn btn-secondary btn-sm d-inline" style="font-size: 14px; font-family: 'Nanum Gothic', sans-serif;white-space: nowrap; border-radius: 8px; background-color: #fff; color: #62BC1B; border: 1px solid #62BC1B;">새 질문</button>
+              </div>
+            </div>
+          </form>
+
+          <div id="loading" class="text-center mt-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+
+         <!-- 추억북 관리 탭 -->
+         <div class="tab-pane fade" id="memory">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; border-radius: 10px 0 0 0; text-align: center; font-family: 'Baloo Bhaijaan 2', sans-serif; font-size: 18px;">FLOG Code</th>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; text-align: center; font-family: 'Baloo Bhaijaan 2', sans-serif; font-size: 18px;">BookNo</th>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; text-align: center; font-family: 'Baloo Bhaijaan 2', sans-serif; font-size: 18px;"></th>
+                <th style="padding: 20px; color: #fff; background-color: #62BC1B; text-align: center; font-family: 'Baloo Bhaijaan 2', sans-serif; font-size: 18px;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="memory-list"></tbody>
+          </table>
+        </div>
+      </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>  
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-storage.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    
+    <script>
+      function showLoading() { // 로딩 표시를 보이도록 설정
+        document.getElementById('loading').style.display = 'flex';
+      }
+          
+      function hideLoading() { // 로딩 표시를 숨기도록 설정
+        document.getElementById('loading').style.display = 'none';
+      }
+
+      var firebaseConfig = {
+        apiKey: "AIzaSyAeXHA4qY_z9yUN726E__hNRYNOcF56tms",
+        authDomain: "flog-e708e.firebaseapp.com",
+        projectId: "flog-e708e",
+        storageBucket: "flog-e708e.appspot.com",
+        messagingSenderId: "343328419455",
+        appId: "1:343328419455:web:d5fea4af8c6210d482594a",
+        measurementId: "G-SB6FHXHJKL"
+      };
+          
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      
+      // 데이터를 실시간으로 표시하는 함수
+      function displayData() {
+        const textList = document.getElementById('text-list');
+        textList.innerHTML = '';
+        db.collection('Question').get().then((snapshot) => {
+          const sortedData = snapshot.docs.map(doc => doc.data()).sort((a, b) => {
+            const puzzleNoA = parseInt(a.puzzleNo, 10); // 숫자로 변환
+            const puzzleNoB = parseInt(b.puzzleNo, 10); // 숫자로 변환 
+            const questionNoA = parseInt(a.questionNo, 10); // 숫자로 변환
+            const questionNoB = parseInt(b.questionNo, 10); // 숫자로 변환
+    
+            // PuzzleNo로 정렬, 동일한 경우 QuestionNo로 정렬
+            if (puzzleNoA !== puzzleNoB) {    
+              return puzzleNoA - puzzleNoB;  
+            } else {   
+              return questionNoA - questionNoB;
+            }
+          });
+      
+          sortedData.forEach((data, index) => {
+            var 질문 = `
+              <tr>
+                <td style="text-align: center; vertical-align: middle; font-family: 'Nanum Gothic', sans-serif;">${data.puzzleNo}</td>
+                <td style="text-align: center; vertical-align: middle; font-family: 'Nanum Gothic', sans-serif;">${data.questionNo}</td>
+                <td class="edit-question-content" contenteditable="true" style="font-family: 'Nanum Gothic', sans-serif;">${data.questionContent}</td>
+                <td><button class="save-button" data-index="${index}" data-puzzleNo="${data.puzzleNo}" data-questionNo="${data.questionNo}" style="font-family: 'Nanum Gothic', sans-serif; font-size: 14px; white-space: nowrap;border-radius: 8px; background-color: #62BC1B; color: #ffffff; border: 1px solid #62BC1B;">저장</button></td>
+              </tr>
+            `;
+                  
+            // 행 번호가 6의 배수인 경우 굵은 구분선 추가
+            if ((index + 1) % 6 === 0) {
+              질문 += '<tr style="border-bottom: 2px solid #62BC1B;"></tr>';
+            }
+            textList.innerHTML += 질문;
+          });
+      
+          const saveButtons = document.querySelectorAll('.save-button');
+          saveButtons.forEach(button => {
+            button.addEventListener('click', function() {
+              const editedContent = this.parentElement.previousElementSibling.textContent;
+              const puzzleNo = Number(this.getAttribute('data-puzzleNo'));
+              const questionNo = Number(this.getAttribute('data-questionNo'));
+      
+              // 조건을 사용하여 문서 찾기
+              db.collection('Question')
+                .where('puzzleNo', '==', puzzleNo)
+                .where('questionNo', '==', questionNo)
+                .get()
+                .then((querySnapshot) => {
+                  querySnapshot.forEach((doc) => { // 문서 업데이트
+                    db.collection('Question').doc(doc.id).update({
+                      questionContent: editedContent
+                    });
+                  });
+                });
+              });
+          });
+        });
+      }
+            
+      questionfromgpt();
+      const inputForm = document.getElementById('input-form');
+      const submitButton = document.querySelector('.btn.btn-primary');
+      
+      inputForm.addEventListener('input', function() {
+        const puzzleNo = document.getElementById('puzzleNo').value;
+        const questionNo = document.getElementById('questionNo').value;
+        const questionContent = document.getElementById('questionContent').value;  
+      });
+    
+      let generatedQuestion; // 변수를 전역 범위에서 선언
+
+      function questionfromgpt() {
+        const apiKey = 'yourapi';
+        const messages = [
+          { role: 'system', content: 'You are a creative question maker.' },
+          { role: 'user', content: '가족과 함께 답변할 수 있는 질문을 한 개만 만들어줘. 근데 조금 구체적이고 재미있게 만들어줘. 예시는 다음과 같아.' },
+          { role: 'user', content: '집에 벌레가 나타났을 때 가장 무서워할 것 같은 가족 구성원은 누구인가요? 그 이유도 함께 적어주세요!' },
+          { role: 'user', content: '지금껏 살아오면서 가장 자랑스러웠던 기억은 무엇인가요?' },
+          { role: 'user', content: '어린시절 본인의 별명은 무엇이었나요? 왜 그런 별명을 가지게 되었나요? '},
+          { role: 'user', content: '학창 시절 가장 싫어했던 과목과 그 이유는?'},
+          { role: 'user', content: '가족과 함께 간 여행 중 가장 기억에 남는 여행은 언제인가요? 여행에서 무엇을 했는지 설명해주세요!!'},
+          { role: 'user', content: '이렇게 재미있고, 답변할 거리가 많은, 가족의 잘 몰랐던 과거 일이나 평소에 하지 못한 이야기들에 대해 알 수 있는 질문이어도 좋아.' },
+          { role: 'user', content: '너무 뻔한 질문은 하지마' }
+        ];
+    
+        const config = {
+          headers: {         
+            Authorization: `Bearer ${apiKey}`,         
+            'Content-Type': 'application/json',         
+          },      
+        }
+
+        const data = {        
+          model: 'gpt-3.5-turbo',        
+          temperature: 0.5,        
+          messages: messages,
+        }
+          
+        axios      
+        .post('https://api.openai.com/v1/chat/completions', data, config) // POST 요청    
+        .then(function (response) { 
+          generatedQuestion = response.data.choices[0].message.content;
+          hideLoading();
+          questionContent = generatedQuestion;
+          document.getElementById('questionContent').value = generatedQuestion;
+        })       
+        .catch(function (error) {         
+          console.error(error);       
+        })
+      }
+    
+      document.getElementById('generate-new-question').addEventListener('click', function() {
+        showLoading(); // 로딩 표시를 보이도록 설정
+        questionContent = '';
+        questionfromgpt(); // 새 질문 생성
+      });
+
+      inputForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const puzzleNo = document.getElementById('puzzleNo').value;
+        const questionNo = document.getElementById('questionNo').value;
+        const questionContent = document.getElementById('questionContent').value;
+    
+        // 음수인 경우 경고 표시 및 처리 중단
+        if (puzzleNo < 0) {
+          alert("PuzzleNo는 음수일 수 없습니다.");
+          return;
+        }
+
+        if (questionNo < 0 || questionNo > 5) {  
+          alert("QuestionNo는 0에서 5 사이의 숫자여야 합니다.");
+          return;
+        }
+    
+        db.collection('Question').add({
+          puzzleNo: Number(puzzleNo), // Convert to number
+          questionNo: Number(questionNo), // Convert to number
+          questionContent: questionContent          
+        }).then(() => {
+          displayData();    
+        });
+
+        questionfromgpt();  
+
+        document.getElementById('puzzleNo').value = '';
+        document.getElementById('questionNo').value = '';
+        document.getElementById('questionContent').value = '';
+      });
+
+      displayData();
+
+      function displayData2() {
+        const memoryBookList = document.getElementById('memory-list');
+        memoryBookList.innerHTML = '';
+        db.collection('Group').where('isMaking', '==', true).get().then((snapshot) => {
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const statusText = data.isMaking ? '진행중' : '완료'; 
+            var 가족 = `
+              <tr style="text-align: center; font-family: 'Nanum Gothic', sans-serif;">
+                <td style="text-align: center; vertical-align: middle; " >${data.flogCode}</td>
+                <td style="text-align: center; vertical-align: middle;" >${data.memoryBookNo}</td>
+                <td><button class="complete-button" data-flogCode="${data.flogCode}" style="font-size: 14px; white-space: nowrap;border-radius: 8px; background-color: #62BC1B; color: #ffffff; border: 1px solid #62BC1B;">완성</button></td>
+                <td style="text-align: center; vertical-align: middle;" >${statusText}</td>
+              </tr>
+            `;
+            memoryBookList.innerHTML += 가족;
+          });
+              
+          const completeButtons = document.querySelectorAll('.complete-button');
+          completeButtons.forEach(button => {  
+            const flogCode = button.getAttribute('data-flogCode');
+            button.addEventListener('click', function() { // 조건을 사용하여 문서 찾기      
+              db.collection('Group')    
+                .where('flogCode', '==', flogCode)   
+                .get()        
+                .then((querySnapshot) => {         
+                  querySnapshot.forEach((doc) => { // 문서 업데이트          
+                    db.collection('Group').doc(doc.id).update({   
+                      isMaking: false          
+                    }).then(() => {          
+                      displayData2(); // Refresh the data after updating          
+                    });   
+                  });   
+                });
+            });
+          });
+        });
+      }
+      displayData2();
+    </script>
+  </body>
+</html>
+    
+    
+        
+      
+         
+          
+          
+          
+
+       
+
+   
